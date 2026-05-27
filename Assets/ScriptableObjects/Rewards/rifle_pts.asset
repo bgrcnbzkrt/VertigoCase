@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 895f304c90e61d84fb1f706f895bc86a, type: 3}
+  m_Name: rifle_pts
+  m_EditorClassIdentifier: Assembly-CSharp::Vertigo.Data.RewardItemData
+  rewardName: rifle_pts
+  icon: {fileID: 21300000, guid: caef113b7cfa84748bc323040675b83f, type: 3}
+  type: 4
+  baseAmount: 40

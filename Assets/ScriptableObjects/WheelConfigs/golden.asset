@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b23a286d1b6b0488c16128046638ac, type: 3}
+  m_Name: golden
+  m_EditorClassIdentifier: Assembly-CSharp::Vertigo.Data.WheelConfig
+  type: 2
+  baseSprite: {fileID: 21300000, guid: c1061d71796563141894ecbbe0c90ea4, type: 3}
+  indicatorSprite: {fileID: 21300000, guid: 0f30e348b2c4da143a0eaa1578126104, type: 3}
+  slices:
+  - reward: {fileID: 11400000, guid: 93fbe3503ca327b479f482507e5bec9a, type: 2}
+    amount: 200
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: 17a25b7fd4f51df4391dac961461f93d, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: 6f4fc85207412e346a980f62818d313d, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: a5c0a1d49804bf64288da149991f3a92, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: 0dd3ae38c2b2f2a49a549028dc261be6, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: 701840cdc45da0847b7ff202299fd87d, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: fdfe81eb263e46f499416fe4b00437c2, type: 2}
+    amount: 1
+    isBomb: 0
+  - reward: {fileID: 11400000, guid: 254338578df0e174e9ae299f1d1d210b, type: 2}
+    amount: 1
+    isBomb: 0
+  spinDuration: 3
+  minRotations: 3
+  maxRotations: 6
