@@ -28,6 +28,9 @@ namespace Vertigo.UI
         [Header("Wheel")]
         [SerializeField] private WheelController wheelController;
 
+        [Header("Currency")]
+        [SerializeField] private TMP_Text goldText;
+
         [Header("Reward Bar")]
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
@@ -51,6 +54,7 @@ namespace Vertigo.UI
             GameManager.OnStateChanged += RefreshButtons;
             GameManager.OnRewardCollected += AddRewardSlot;
             GameManager.OnRewardsCleared += ClearRewardBar;
+            CurrencyManager.OnGoldChanged += RefreshGold;
         }
 
         private void OnDisable()
@@ -59,6 +63,7 @@ namespace Vertigo.UI
             GameManager.OnStateChanged -= RefreshButtons;
             GameManager.OnRewardCollected -= AddRewardSlot;
             GameManager.OnRewardsCleared -= ClearRewardBar;
+            CurrencyManager.OnGoldChanged -= RefreshGold;
         }
 
         private void RefreshZone(int zone, ZoneType type)
@@ -87,10 +92,14 @@ namespace Vertigo.UI
 
                 if (zone < 1)
                 {
-                    slot.background.gameObject.SetActive(false);
+                    slot.background.gameObject.SetActive(true);
+                    slot.background.color = Color.clear;
+                    slot.text.text = "";
+                    slot.background.transform.localScale = Vector3.one;
                     continue;
                 }
 
+                slot.background.color = Color.white;
                 slot.background.gameObject.SetActive(true);
                 slot.text.text = zone.ToString();
 
@@ -121,6 +130,14 @@ namespace Vertigo.UI
         private void RefreshButtons(GameState state)
         {
             btnSpin.interactable = state == GameState.Playing;
+            if (state == GameState.Playing)
+                RefreshGold(CurrencyManager.Instance.Gold);
+        }
+
+        private void RefreshGold(int gold)
+        {
+            if (goldText != null)
+                goldText.text = gold.ToString();
         }
 
         private void AddRewardSlot(CollectedReward reward)

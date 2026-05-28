@@ -71,6 +71,14 @@ namespace Vertigo.Core
             SetState(GameState.Collecting);
         }
 
+        public void Revive()
+        {
+            if (State != GameState.BombHit) return;
+            if (!CurrencyManager.Instance.TrySpend(CurrencyManager.Instance.ReviveCost)) return;
+            SetState(GameState.Playing);
+            OnZoneChanged?.Invoke(CurrentZone, GetZoneType(CurrentZone));
+        }
+
         public void GiveUp()
         {
             collected.Clear();
@@ -78,7 +86,16 @@ namespace Vertigo.Core
             SetState(GameState.MainMenu);
         }
 
-        public void BackToMenu() => SetState(GameState.MainMenu);
+        public void BackToMenu()
+        {
+            if (State == GameState.Collecting)
+            {
+                foreach (var r in collected)
+                    if (r.Reward.type == RewardType.Currency)
+                        CurrencyManager.Instance.Add(r.Amount);
+            }
+            SetState(GameState.MainMenu);
+        }
 
         public ZoneType GetZoneType(int zone)
         {
