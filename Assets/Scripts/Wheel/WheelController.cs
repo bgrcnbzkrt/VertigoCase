@@ -39,6 +39,9 @@ namespace Vertigo.Wheel
         public void Setup(WheelConfig wheelConfig)
         {
             config = wheelConfig;
+            spinning = false;
+            DOTween.Kill(baseImage.rectTransform);
+            DOTween.Kill(wheelContainer);
             baseImage.sprite = config.baseSprite;
             indicatorImage.sprite = config.indicatorSprite;
 

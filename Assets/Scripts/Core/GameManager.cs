@@ -59,7 +59,19 @@ namespace Vertigo.Core
             }
 
             var reward = new CollectedReward(result.reward, result.amount, CurrentZone);
-            collected.Add(reward);
+
+            int idx = collected.FindIndex(r => r.Reward == result.reward);
+            if (idx >= 0)
+            {
+                var existing = collected[idx];
+                existing.Amount += result.amount;
+                collected[idx] = existing;
+            }
+            else
+            {
+                collected.Add(reward);
+            }
+
             OnRewardCollected?.Invoke(reward);
             AdvanceZone();
             SetState(GameState.Playing);
@@ -74,6 +86,7 @@ namespace Vertigo.Core
         public void Revive()
         {
             if (State != GameState.BombHit) return;
+            if (CurrencyManager.Instance == null) return;
             if (!CurrencyManager.Instance.TrySpend(CurrencyManager.Instance.ReviveCost)) return;
             SetState(GameState.Playing);
             OnZoneChanged?.Invoke(CurrentZone, GetZoneType(CurrentZone));

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,8 +34,10 @@ namespace Vertigo.UI
         [SerializeField] private TMP_Text goldText;
 
         [Header("Reward Bar")]
+        [SerializeField] private ScrollRect rewardScrollRect;
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
+        [SerializeField] private RectTransform flyingRewardIcon;
 
         [Serializable]
         public class ZoneSlot
@@ -55,6 +59,8 @@ namespace Vertigo.UI
             GameManager.OnRewardCollected += AddRewardSlot;
             GameManager.OnRewardsCleared += ClearRewardBar;
             CurrencyManager.OnGoldChanged += RefreshGold;
+            if (GameManager.Instance != null)
+                RefreshButtons(GameManager.Instance.State);
         }
 
         private void OnDisable()
@@ -77,7 +83,7 @@ namespace Vertigo.UI
                 _ => "ZONE " + zone
             };
 
-            btnLeave.gameObject.SetActive(GameManager.Instance.CanLeave());
+            btnLeave.interactable = GameManager.Instance.CanLeave();
             UpdateZoneIndicator(zone);
         }
 
@@ -130,7 +136,7 @@ namespace Vertigo.UI
         private void RefreshButtons(GameState state)
         {
             btnSpin.interactable = state == GameState.Playing;
-            if (state == GameState.Playing)
+            if (state == GameState.Playing && CurrencyManager.Instance != null)
                 RefreshGold(CurrencyManager.Instance.Gold);
         }
 
@@ -140,16 +146,77 @@ namespace Vertigo.UI
                 goldText.text = gold.ToString();
         }
 
+        private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
+        private Image flyingRewardImage;
+
+        private void Awake()
+        {
+            flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
+            flyingRewardIcon.gameObject.SetActive(false);
+        }
+
         private void AddRewardSlot(CollectedReward reward)
         {
-            var slot = Instantiate(rewardSlotPrefab, rewardBarContainer);
-            slot.Setup(reward);
+            flyingRewardImage.sprite = reward.Reward.icon;
+            flyingRewardIcon.position = wheelController.transform.position;
+            flyingRewardIcon.localScale = Vector3.zero;
+            flyingRewardIcon.gameObject.SetActive(true);
+
+            bool isNew = !rewardSlotMap.TryGetValue(reward.Reward, out var targetSlot);
+
+            if (isNew)
+            {
+                targetSlot = Instantiate(rewardSlotPrefab, rewardBarContainer);
+                targetSlot.Setup(reward);
+                targetSlot.transform.localScale = Vector3.zero;
+                rewardSlotMap[reward.Reward] = targetSlot;
+                Canvas.ForceUpdateCanvases();
+            }
+
+            if (rewardScrollRect != null)
+                ScrollToItem(targetSlot.transform as RectTransform);
+
+            var slot = targetSlot;
+            var seq = DOTween.Sequence();
+            seq.Append(flyingRewardIcon.DOScale(1.5f, 0.3f).SetEase(Ease.OutBack));
+            seq.Append(flyingRewardIcon.DOMove(slot.transform.position, 0.5f).SetEase(Ease.InBack));
+            seq.Join(flyingRewardIcon.DOScale(0.3f, 0.5f));
+            seq.OnComplete(() =>
+            {
+                flyingRewardIcon.gameObject.SetActive(false);
+                if (isNew)
+                    slot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+                else
+                    slot.AddAmount(reward.Amount);
+            });
+        }
+
+        private void ScrollToItem(RectTransform item)
+        {
+            if (rewardScrollRect == null || item == null) return;
+            Canvas.ForceUpdateCanvases();
+
+            var content = rewardBarContainer as RectTransform;
+            var viewport = rewardScrollRect.viewport != null
+                ? rewardScrollRect.viewport
+                : rewardScrollRect.GetComponent<RectTransform>();
+
+            float contentH = content.rect.height;
+            float viewportH = viewport.rect.height;
+            if (contentH <= viewportH) return;
+
+            float itemTop = Mathf.Abs(item.anchoredPosition.y);
+            float target = Mathf.Clamp01(itemTop / (contentH - viewportH));
+
+            DOTween.To(() => rewardScrollRect.verticalNormalizedPosition,
+                x => rewardScrollRect.verticalNormalizedPosition = x, 1f - target, 0.3f);
         }
 
         private void ClearRewardBar()
         {
             foreach (Transform child in rewardBarContainer)
                 Destroy(child.gameObject);
+            rewardSlotMap.Clear();
         }
 
         protected override void OnValidate()
