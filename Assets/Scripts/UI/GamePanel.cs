@@ -13,8 +13,8 @@ namespace Vertigo.UI
     public class GamePanel : PanelBase
     {
         [Header("Controls")]
-        [SerializeField] private Button btnSpin;
-        [SerializeField] private Button btnLeave;
+        [SerializeField] private Button buttonSpin;
+        [SerializeField] private Button buttonLeave;
 
         [Header("Zone")]
         [SerializeField] private TMP_Text zoneTitleText;
@@ -46,8 +46,8 @@ namespace Vertigo.UI
 
         private void Start()
         {
-            btnSpin.onClick.AddListener(() => GameManager.Instance.RequestSpin());
-            btnLeave.onClick.AddListener(() => GameManager.Instance.CollectAndLeave());
+            buttonSpin.onClick.AddListener(() => GameManager.Instance.RequestSpin());
+            buttonLeave.onClick.AddListener(() => GameManager.Instance.CollectAndLeave());
         }
 
         private void OnEnable()
@@ -81,7 +81,7 @@ namespace Vertigo.UI
                 _ => "ZONE " + zone
             };
 
-            btnLeave.interactable = GameManager.Instance.CanLeave();
+            buttonLeave.interactable = GameManager.Instance.CanLeave();
             UpdateZoneIndicator(zone);
         }
 
@@ -129,7 +129,7 @@ namespace Vertigo.UI
 
         private void RefreshButtons(GameState state)
         {
-            btnSpin.interactable = state == GameState.Playing;
+            buttonSpin.interactable = state == GameState.Playing;
             if (state == GameState.Playing && CurrencyManager.Instance != null)
                 RefreshGold(CurrencyManager.Instance.Gold);
         }
@@ -231,8 +231,8 @@ namespace Vertigo.UI
             base.OnValidate();
             foreach (var btn in GetComponentsInChildren<Button>(true))
             {
-                if (btn.name == "ui_btn_spin") btnSpin = btn;
-                if (btn.name == "ui_btn_leave") btnLeave = btn;
+                if (btn.name == "ui_button_spin") buttonSpin = btn;
+                if (btn.name == "ui_button_leave") buttonLeave = btn;
             }
             if (wheelController == null)
                 wheelController = GetComponentInChildren<WheelController>(true);

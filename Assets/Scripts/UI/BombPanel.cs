@@ -7,15 +7,15 @@ namespace Vertigo.UI
 {
     public class BombPanel : PanelBase
     {
-        [SerializeField] private Button btnGiveUp;
-        [SerializeField] private Button btnRevive;
+        [SerializeField] private Button buttonGiveUp;
+        [SerializeField] private Button buttonRevive;
         [SerializeField] private TMP_Text reviveCostText;
         [SerializeField] private TMP_Text goldText;
 
         private void Start()
         {
-            btnGiveUp.onClick.AddListener(() => GameManager.Instance.GiveUp());
-            btnRevive.onClick.AddListener(() => GameManager.Instance.Revive());
+            buttonGiveUp.onClick.AddListener(() => GameManager.Instance.GiveUp());
+            buttonRevive.onClick.AddListener(() => GameManager.Instance.Revive());
         }
 
         public override void Show()
@@ -23,7 +23,7 @@ namespace Vertigo.UI
             base.Show();
             int cost = CurrencyManager.Instance.ReviveCost;
             bool canAfford = CurrencyManager.Instance.CanAfford(cost);
-            btnRevive.interactable = canAfford;
+            buttonRevive.interactable = canAfford;
             if (reviveCostText != null)
                 reviveCostText.text = cost.ToString();
             if (goldText != null)
@@ -35,8 +35,8 @@ namespace Vertigo.UI
             base.OnValidate();
             foreach (var btn in GetComponentsInChildren<Button>(true))
             {
-                if (btn.name == "ui_btn_give_up") btnGiveUp = btn;
-                if (btn.name == "ui_btn_revive") btnRevive = btn;
+                if (btn.name == "ui_button_give_up") buttonGiveUp = btn;
+                if (btn.name == "ui_button_revive") buttonRevive = btn;
             }
         }
     }

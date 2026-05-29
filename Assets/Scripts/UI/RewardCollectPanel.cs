@@ -6,13 +6,13 @@ namespace Vertigo.UI
 {
     public class RewardCollectPanel : PanelBase
     {
-        [SerializeField] private Button btnCollect;
+        [SerializeField] private Button buttonCollect;
         [SerializeField] private Transform rewardGrid;
         [SerializeField] private RewardSlotUI slotPrefab;
 
         private void Start()
         {
-            btnCollect.onClick.AddListener(() => GameManager.Instance.BackToMenu());
+            buttonCollect.onClick.AddListener(() => GameManager.Instance.BackToMenu());
         }
 
         public override void Show()
@@ -33,7 +33,7 @@ namespace Vertigo.UI
         {
             base.OnValidate();
             foreach (var btn in GetComponentsInChildren<Button>(true))
-                if (btn.name == "ui_btn_collect") btnCollect = btn;
+                if (btn.name == "ui_button_collect") buttonCollect = btn;
         }
     }
 }
