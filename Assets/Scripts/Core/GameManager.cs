@@ -52,7 +52,7 @@ namespace Vertigo.Core
 
         public void ReportSpinResult(SliceData result)
         {
-            if (result.isBomb)
+            if (result.reward.type == RewardType.Bomb)
             {
                 SetState(GameState.BombHit);
                 return;
@@ -105,8 +105,12 @@ namespace Vertigo.Core
             if (State == GameState.Collecting)
             {
                 foreach (var r in collected)
-                    if (r.Reward.type == RewardType.Currency)
-                        CurrencyManager.Instance.Add(r.Amount);
+                {
+                    if (r.Reward.type == RewardType.Gold)
+                        CurrencyManager.Instance.AddGold(r.Amount);
+                    else if (r.Reward.type == RewardType.Money)
+                        CurrencyManager.Instance.AddMoney(r.Amount);
+                }
             }
             collected.Clear();
             OnRewardsCleared?.Invoke();

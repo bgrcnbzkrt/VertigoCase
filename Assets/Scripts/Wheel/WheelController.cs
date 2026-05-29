@@ -56,7 +56,7 @@ namespace Vertigo.Wheel
                 var slice = config.slices[i];
                 sliceRefs[i].icon.sprite = slice.reward.icon;
                 sliceRefs[i].icon.preserveAspect = true;
-                sliceRefs[i].amountText.text = slice.isBomb ? "" : "x" + config.ScaleAmount(slice.amount, zone);
+                sliceRefs[i].amountText.text = slice.reward.type == RewardType.Bomb ? "" : "x" + config.ScaleAmount(slice.amount, zone);
             }
 
             if (!sameWheel)

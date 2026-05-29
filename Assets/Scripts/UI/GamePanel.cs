@@ -36,6 +36,7 @@ namespace Vertigo.UI
 
         [Header("Currency")]
         [SerializeField] private TMP_Text goldText;
+        [SerializeField] private TMP_Text moneyText;
 
         [Header("Reward Bar")]
         [SerializeField] private ScrollRect rewardScrollRect;
@@ -57,6 +58,7 @@ namespace Vertigo.UI
             GameManager.OnRewardCollected += AddRewardSlot;
             GameManager.OnRewardsCleared += ClearRewardBar;
             CurrencyManager.OnGoldChanged += RefreshGold;
+            CurrencyManager.OnMoneyChanged += RefreshMoney;
             if (GameManager.Instance != null)
                 RefreshButtons(GameManager.Instance.State);
         }
@@ -68,6 +70,7 @@ namespace Vertigo.UI
             GameManager.OnRewardCollected -= AddRewardSlot;
             GameManager.OnRewardsCleared -= ClearRewardBar;
             CurrencyManager.OnGoldChanged -= RefreshGold;
+            CurrencyManager.OnMoneyChanged -= RefreshMoney;
         }
 
         private void RefreshZone(int zone, ZoneType type)
@@ -138,12 +141,20 @@ namespace Vertigo.UI
         {
             buttonSpin.interactable = state == GameState.Playing;
             if (state == GameState.Playing && CurrencyManager.Instance != null)
+            {
                 RefreshGold(CurrencyManager.Instance.Gold);
+                RefreshMoney(CurrencyManager.Instance.Money);
+            }
         }
 
         private void RefreshGold(int gold)
         {
             goldText.text = gold.ToString();
+        }
+
+        private void RefreshMoney(int money)
+        {
+            moneyText.text = money.ToString();
         }
 
         private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();

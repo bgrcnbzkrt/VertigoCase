@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Vertigo.Data
 {
-    public enum RewardType { Currency, Weapon, Consumable, Cosmetic, Points, Chest }
+    public enum RewardType { Gold, Weapon, Consumable, Cosmetic, Points, Chest, Money, Bomb }
 
     [CreateAssetMenu(fileName = "NewReward", menuName = "Vertigo/Reward Item")]
     public class RewardItemData : ScriptableObject

@@ -30,6 +30,5 @@ namespace Vertigo.Data
     {
         public RewardItemData reward;
         public int amount = 1;
-        public bool isBomb;
     }
 }
