@@ -13,10 +13,12 @@ namespace Vertigo.Wheel
         [SerializeField] private RectTransform wheelContainer;
         [SerializeField] private Image baseImage;
         [SerializeField] private Image indicatorImage;
+        [SerializeField] private RectTransform glow;
         [SerializeField] private List<SliceRef> sliceRefs;
 
         private WheelConfig config;
         private bool spinning;
+        private bool glowStarted;
 
         [System.Serializable]
         public class SliceRef
@@ -45,6 +47,8 @@ namespace Vertigo.Wheel
             baseImage.sprite = config.baseSprite;
             indicatorImage.sprite = config.indicatorSprite;
 
+            SetupGlow();
+
             for (int i = 0; i < sliceRefs.Count; i++)
             {
                 if (i >= config.slices.Count)
@@ -56,11 +60,22 @@ namespace Vertigo.Wheel
                 sliceRefs[i].root.SetActive(true);
                 var slice = config.slices[i];
                 sliceRefs[i].icon.sprite = slice.reward.icon;
+                sliceRefs[i].icon.preserveAspect = true;
                 sliceRefs[i].amountText.text = slice.isBomb ? "" : "x" + slice.amount;
             }
 
             wheelContainer.localRotation = Quaternion.identity;
             baseImage.rectTransform.localRotation = Quaternion.identity;
+        }
+
+        private void SetupGlow()
+        {
+            if (glow == null || glowStarted) return;
+            glowStarted = true;
+
+            glow.DOScale(1.1f, 1.4f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine);
         }
 
         private void Spin()

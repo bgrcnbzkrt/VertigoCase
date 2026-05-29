@@ -38,6 +38,7 @@ namespace Vertigo.UI
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
         [SerializeField] private RectTransform flyingRewardIcon;
+        [SerializeField] private RectTransform collectFlash;
 
         [Serializable]
         public class ZoneSlot
@@ -148,16 +149,24 @@ namespace Vertigo.UI
 
         private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
         private Image flyingRewardImage;
+        private Image collectFlashImage;
 
         private void Awake()
         {
             flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
             flyingRewardIcon.gameObject.SetActive(false);
+
+            if (collectFlash != null)
+            {
+                collectFlashImage = collectFlash.GetComponent<Image>();
+                collectFlash.gameObject.SetActive(false);
+            }
         }
 
         private void AddRewardSlot(CollectedReward reward)
         {
             flyingRewardImage.sprite = reward.Reward.icon;
+            flyingRewardImage.preserveAspect = true;
             flyingRewardIcon.position = wheelController.transform.position;
             flyingRewardIcon.localScale = Vector3.zero;
             flyingRewardIcon.gameObject.SetActive(true);
@@ -184,11 +193,29 @@ namespace Vertigo.UI
             seq.OnComplete(() =>
             {
                 flyingRewardIcon.gameObject.SetActive(false);
+                PlayCollectFlash(slot.transform.position);
                 if (isNew)
                     slot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
                     slot.AddAmount(reward.Amount);
             });
+        }
+
+        private void PlayCollectFlash(Vector3 worldPos)
+        {
+            if (collectFlash == null) return;
+
+            collectFlash.DOKill();
+            collectFlashImage.DOKill();
+            collectFlash.gameObject.SetActive(true);
+            collectFlash.position = worldPos;
+            collectFlash.localScale = Vector3.one * 0.4f;
+            collectFlashImage.color = new Color(1f, 1f, 1f, 1f);
+
+            var seq = DOTween.Sequence();
+            seq.Append(collectFlash.DOScale(1.4f, 0.35f).SetEase(Ease.OutQuad));
+            seq.Join(collectFlashImage.DOFade(0f, 0.35f));
+            seq.OnComplete(() => collectFlash.gameObject.SetActive(false));
         }
 
         private void ScrollToItem(RectTransform item)
@@ -201,15 +228,27 @@ namespace Vertigo.UI
                 ? rewardScrollRect.viewport
                 : rewardScrollRect.GetComponent<RectTransform>();
 
-            float contentH = content.rect.height;
-            float viewportH = viewport.rect.height;
-            if (contentH <= viewportH) return;
+            float scrollable = content.rect.height - viewport.rect.height;
+            if (scrollable <= 0f) return;
 
-            float itemTop = Mathf.Abs(item.anchoredPosition.y);
-            float target = Mathf.Clamp01(itemTop / (contentH - viewportH));
+            float viewportH = viewport.rect.height;
+            float itemTopDist = content.rect.yMax - (item.localPosition.y + item.rect.yMax);
+            float itemBottomDist = content.rect.yMax - (item.localPosition.y + item.rect.yMin);
+            float currentOffset = (1f - rewardScrollRect.verticalNormalizedPosition) * scrollable;
+
+            float targetOffset;
+            if (itemTopDist < currentOffset)
+                targetOffset = itemTopDist;
+            else if (itemBottomDist > currentOffset + viewportH)
+                targetOffset = itemBottomDist - viewportH;
+            else
+                return;
+
+            targetOffset = Mathf.Clamp(targetOffset, 0f, scrollable);
 
             DOTween.To(() => rewardScrollRect.verticalNormalizedPosition,
-                x => rewardScrollRect.verticalNormalizedPosition = x, 1f - target, 0.3f);
+                x => rewardScrollRect.verticalNormalizedPosition = x,
+                1f - targetOffset / scrollable, 0.3f);
         }
 
         private void ClearRewardBar()

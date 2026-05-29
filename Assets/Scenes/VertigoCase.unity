@@ -1680,6 +1680,7 @@ MonoBehaviour:
   rewardBarContainer: {fileID: 9900002}
   rewardSlotPrefab: {fileID: 8388118635751466133, guid: 3e5b199c4a1ebcf43b8d1b4a790aa52f, type: 3}
   flyingRewardIcon: {fileID: 479634100}
+  collectFlash: {fileID: 0}
 --- !u!1 &650698430
 GameObject:
   m_ObjectHideFlags: 0
@@ -3067,6 +3068,8 @@ GameObject:
   - component: {fileID: 1216439044}
   - component: {fileID: 1216439048}
   - component: {fileID: 1216439047}
+  - component: {fileID: 1216439050}
+  - component: {fileID: 1216439049}
   m_Layer: 5
   m_Name: ui_panel_rewards
   m_TagString: Untagged
@@ -3179,6 +3182,44 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1216439049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216439043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1216439050
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216439043}
+  m_CullTransparentMesh: 1
 --- !u!1 &1217098096
 GameObject:
   m_ObjectHideFlags: 0
@@ -3998,6 +4039,8 @@ MonoBehaviour:
   btnCollect: {fileID: 1299838955}
   rewardGrid: {fileID: 1107436316}
   slotPrefab: {fileID: 8388118635751466133, guid: 3e5b199c4a1ebcf43b8d1b4a790aa52f, type: 3}
+  celebrationGlow: {fileID: 0}
+  celebrationFlash: {fileID: 0}
 --- !u!1 &1410905462
 GameObject:
   m_ObjectHideFlags: 0
@@ -4514,6 +4557,7 @@ MonoBehaviour:
   wheelContainer: {fileID: 1053751425}
   baseImage: {fileID: 1446173072}
   indicatorImage: {fileID: 2095001080}
+  glow: {fileID: 0}
   sliceRefs:
   - icon: {fileID: 1411419870}
     amountText: {fileID: 1694398964}
