@@ -21,7 +21,7 @@ namespace Vertigo.Core
         public int CurrentZone { get; private set; }
         public IReadOnlyList<CollectedReward> Rewards => collected;
 
-        private readonly List<CollectedReward> collected = new List<CollectedReward>();
+        private readonly List<CollectedReward> collected = new();
 
         public static event Action<GameState> OnStateChanged;
         public static event Action OnSpinRequested;
@@ -29,7 +29,7 @@ namespace Vertigo.Core
         public static event Action<CollectedReward> OnRewardCollected;
         public static event Action OnRewardsCleared;
 
-        void Awake()
+        private void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
@@ -58,13 +58,14 @@ namespace Vertigo.Core
                 return;
             }
 
-            var reward = new CollectedReward(result.reward, result.amount, CurrentZone);
+            int amount = GetCurrentWheel().ScaleAmount(result.amount, CurrentZone);
+            var reward = new CollectedReward(result.reward, amount);
 
             int idx = collected.FindIndex(r => r.Reward == result.reward);
             if (idx >= 0)
             {
                 var existing = collected[idx];
-                existing.Amount += result.amount;
+                existing.Amount += amount;
                 collected[idx] = existing;
             }
             else
@@ -130,13 +131,13 @@ namespace Vertigo.Core
             return t == ZoneType.Safe || t == ZoneType.Super;
         }
 
-        void AdvanceZone()
+        private void AdvanceZone()
         {
             CurrentZone++;
             OnZoneChanged?.Invoke(CurrentZone, GetZoneType(CurrentZone));
         }
 
-        void SetState(GameState newState)
+        private void SetState(GameState newState)
         {
             State = newState;
             OnStateChanged?.Invoke(newState);

@@ -15,7 +15,7 @@ namespace Vertigo.Core
 
         public static event Action<int> OnGoldChanged;
 
-        void Awake()
+        private void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
@@ -40,6 +40,6 @@ namespace Vertigo.Core
 
         public bool CanAfford(int amount) => Gold >= amount;
 
-        void Save() => PlayerPrefs.SetInt("Gold", Gold);
+        private void Save() => PlayerPrefs.SetInt("Gold", Gold);
     }
 }

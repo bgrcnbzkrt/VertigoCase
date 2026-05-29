@@ -1680,7 +1680,6 @@ MonoBehaviour:
   rewardBarContainer: {fileID: 9900002}
   rewardSlotPrefab: {fileID: 8388118635751466133, guid: 3e5b199c4a1ebcf43b8d1b4a790aa52f, type: 3}
   flyingRewardIcon: {fileID: 479634100}
-  collectFlash: {fileID: 0}
 --- !u!1 &650698430
 GameObject:
   m_ObjectHideFlags: 0
@@ -1779,7 +1778,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &672095206
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4039,8 +4038,6 @@ MonoBehaviour:
   btnCollect: {fileID: 1299838955}
   rewardGrid: {fileID: 1107436316}
   slotPrefab: {fileID: 8388118635751466133, guid: 3e5b199c4a1ebcf43b8d1b4a790aa52f, type: 3}
-  celebrationGlow: {fileID: 0}
-  celebrationFlash: {fileID: 0}
 --- !u!1 &1410905462
 GameObject:
   m_ObjectHideFlags: 0
@@ -4557,7 +4554,6 @@ MonoBehaviour:
   wheelContainer: {fileID: 1053751425}
   baseImage: {fileID: 1446173072}
   indicatorImage: {fileID: 2095001080}
-  glow: {fileID: 0}
   sliceRefs:
   - icon: {fileID: 1411419870}
     amountText: {fileID: 1694398964}
@@ -5071,7 +5067,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+  m_Color: {r: 1, g: 0.065378696, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

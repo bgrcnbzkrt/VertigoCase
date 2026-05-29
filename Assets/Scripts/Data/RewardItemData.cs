@@ -17,13 +17,11 @@ namespace Vertigo.Data
     {
         public RewardItemData Reward;
         public int Amount;
-        public int Zone;
 
-        public CollectedReward(RewardItemData reward, int amount, int zone)
+        public CollectedReward(RewardItemData reward, int amount)
         {
             Reward = reward;
             Amount = amount;
-            Zone = zone;
         }
     }
 }

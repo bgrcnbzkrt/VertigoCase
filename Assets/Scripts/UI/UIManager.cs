@@ -13,7 +13,7 @@ namespace Vertigo.UI
 
         private void Awake()
         {
-            DG.Tweening.DOTween.Init();
+            DOTween.Init();
         }
 
         private void Start()

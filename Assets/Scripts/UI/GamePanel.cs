@@ -38,7 +38,6 @@ namespace Vertigo.UI
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
         [SerializeField] private RectTransform flyingRewardIcon;
-        [SerializeField] private RectTransform collectFlash;
 
         [Serializable]
         public class ZoneSlot
@@ -75,7 +74,7 @@ namespace Vertigo.UI
 
         private void RefreshZone(int zone, ZoneType type)
         {
-            wheelController.Setup(GameManager.Instance.GetCurrentWheel());
+            wheelController.Setup(GameManager.Instance.GetCurrentWheel(), zone);
 
             zoneTitleText.text = type switch
             {
@@ -149,24 +148,17 @@ namespace Vertigo.UI
 
         private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
         private Image flyingRewardImage;
-        private Image collectFlashImage;
 
         private void Awake()
         {
             flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
+            flyingRewardImage.preserveAspect = true;
             flyingRewardIcon.gameObject.SetActive(false);
-
-            if (collectFlash != null)
-            {
-                collectFlashImage = collectFlash.GetComponent<Image>();
-                collectFlash.gameObject.SetActive(false);
-            }
         }
 
         private void AddRewardSlot(CollectedReward reward)
         {
             flyingRewardImage.sprite = reward.Reward.icon;
-            flyingRewardImage.preserveAspect = true;
             flyingRewardIcon.position = wheelController.transform.position;
             flyingRewardIcon.localScale = Vector3.zero;
             flyingRewardIcon.gameObject.SetActive(true);
@@ -193,29 +185,11 @@ namespace Vertigo.UI
             seq.OnComplete(() =>
             {
                 flyingRewardIcon.gameObject.SetActive(false);
-                PlayCollectFlash(slot.transform.position);
                 if (isNew)
                     slot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
                     slot.AddAmount(reward.Amount);
             });
-        }
-
-        private void PlayCollectFlash(Vector3 worldPos)
-        {
-            if (collectFlash == null) return;
-
-            collectFlash.DOKill();
-            collectFlashImage.DOKill();
-            collectFlash.gameObject.SetActive(true);
-            collectFlash.position = worldPos;
-            collectFlash.localScale = Vector3.one * 0.4f;
-            collectFlashImage.color = new Color(1f, 1f, 1f, 1f);
-
-            var seq = DOTween.Sequence();
-            seq.Append(collectFlash.DOScale(1.4f, 0.35f).SetEase(Ease.OutQuad));
-            seq.Join(collectFlashImage.DOFade(0f, 0.35f));
-            seq.OnComplete(() => collectFlash.gameObject.SetActive(false));
         }
 
         private void ScrollToItem(RectTransform item)
