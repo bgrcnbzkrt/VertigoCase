@@ -108,6 +108,8 @@ namespace Vertigo.Core
                     if (r.Reward.type == RewardType.Currency)
                         CurrencyManager.Instance.Add(r.Amount);
             }
+            collected.Clear();
+            OnRewardsCleared?.Invoke();
             SetState(GameState.MainMenu);
         }
 
