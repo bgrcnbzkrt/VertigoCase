@@ -42,6 +42,7 @@ namespace Vertigo.UI
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
         [SerializeField] private RectTransform flyingRewardIcon;
+        [SerializeField] private GameObject flyingRewardGlow;
 
         private void Start()
         {
@@ -153,6 +154,7 @@ namespace Vertigo.UI
             flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
             flyingRewardImage.preserveAspect = true;
             flyingRewardIcon.gameObject.SetActive(false);
+            flyingRewardGlow.SetActive(false);
         }
 
         private void AddRewardSlot(CollectedReward reward)
@@ -161,6 +163,7 @@ namespace Vertigo.UI
             flyingRewardIcon.position = wheelController.transform.position;
             flyingRewardIcon.localScale = Vector3.zero;
             flyingRewardIcon.gameObject.SetActive(true);
+            flyingRewardGlow.SetActive(true);
 
             bool isNew = !rewardSlotMap.TryGetValue(reward.Reward, out var targetSlot);
 
@@ -183,6 +186,7 @@ namespace Vertigo.UI
             seq.OnComplete(() =>
             {
                 flyingRewardIcon.gameObject.SetActive(false);
+                flyingRewardGlow.SetActive(false);
                 if (isNew)
                     targetSlot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
