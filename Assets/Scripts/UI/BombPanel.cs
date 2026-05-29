@@ -10,6 +10,7 @@ namespace Vertigo.UI
         [SerializeField] private Button btnGiveUp;
         [SerializeField] private Button btnRevive;
         [SerializeField] private TMP_Text reviveCostText;
+        [SerializeField] private TMP_Text goldText;
 
         private void Start()
         {
@@ -25,6 +26,8 @@ namespace Vertigo.UI
             btnRevive.interactable = canAfford;
             if (reviveCostText != null)
                 reviveCostText.text = cost.ToString();
+            if (goldText != null)
+                goldText.text = CurrencyManager.Instance.Gold.ToString();
         }
 
         protected override void OnValidate()
