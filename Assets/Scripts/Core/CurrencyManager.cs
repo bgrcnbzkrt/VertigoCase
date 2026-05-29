@@ -22,6 +22,7 @@ namespace Vertigo.Core
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
+            // load saved balances, fall back to starting values on first run
             Gold = PlayerPrefs.GetInt("Gold", startingGold);
             Money = PlayerPrefs.GetInt("Money", startingMoney);
         }

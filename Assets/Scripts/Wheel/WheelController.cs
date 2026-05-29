@@ -59,6 +59,7 @@ namespace Vertigo.Wheel
                 sliceRefs[i].amountText.text = slice.reward.type == RewardType.Bomb ? "" : "x" + config.ScaleAmount(slice.amount, zone);
             }
 
+            // only reset rotation when switching wheels, otherwise it jumps mid-game
             if (!sameWheel)
                 baseImage.rectTransform.localRotation = Quaternion.identity;
         }
@@ -75,6 +76,7 @@ namespace Vertigo.Wheel
 
             var targetRotation = new Vector3(0, 0, totalAngle);
 
+            // FastBeyond360 -> actually spin the turns, don't snap the short way
             baseImage.rectTransform
                 .DORotate(targetRotation, config.spinDuration, RotateMode.FastBeyond360)
                 .SetEase(Ease.OutQuart)

@@ -33,6 +33,7 @@ namespace Vertigo.UI
         protected override void OnValidate()
         {
             base.OnValidate();
+            // grab buttons by name so I don't have to re-drag refs every prefab change
             foreach (var btn in GetComponentsInChildren<Button>(true))
             {
                 if (btn.name == "ui_button_give_up") buttonGiveUp = btn;

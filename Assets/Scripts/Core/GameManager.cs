@@ -31,7 +31,7 @@ namespace Vertigo.Core
 
         private void Awake()
         {
-            if (Instance != null) { Destroy(gameObject); return; }
+            if (Instance != null) { Destroy(gameObject); return; } // kill dupes
             Instance = this;
         }
 
@@ -61,6 +61,7 @@ namespace Vertigo.Core
             int amount = GetCurrentWheel().ScaleAmount(result.amount, CurrentZone);
             var reward = new CollectedReward(result.reward, amount);
 
+            // stack onto existing row if we already won this one
             int idx = collected.FindIndex(r => r.Reward == result.reward);
             if (idx >= 0)
             {
@@ -119,6 +120,7 @@ namespace Vertigo.Core
 
         public ZoneType GetZoneType(int zone)
         {
+            // safe zone every 5, super every 30
             if (zone > 0 && zone % 30 == 0) return ZoneType.Super;
             if (zone > 0 && zone % 5 == 0) return ZoneType.Safe;
             return ZoneType.Normal;

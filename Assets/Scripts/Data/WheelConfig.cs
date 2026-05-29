@@ -21,6 +21,7 @@ namespace Vertigo.Data
 
         public int ScaleAmount(int baseAmount, int zone)
         {
+            // linear scale, zone 1 = base
             return Mathf.RoundToInt(baseAmount * (1f + rewardGrowthPerZone * (zone - 1)));
         }
     }
