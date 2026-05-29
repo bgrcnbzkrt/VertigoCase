@@ -24,10 +24,8 @@ namespace Vertigo.UI
             int cost = CurrencyManager.Instance.ReviveCost;
             bool canAfford = CurrencyManager.Instance.CanAfford(cost);
             buttonRevive.interactable = canAfford;
-            if (reviveCostText != null)
-                reviveCostText.text = cost.ToString();
-            if (goldText != null)
-                goldText.text = CurrencyManager.Instance.Gold.ToString();
+            reviveCostText.text = cost.ToString();
+            goldText.text = CurrencyManager.Instance.Gold.ToString();
         }
 
         protected override void OnValidate()

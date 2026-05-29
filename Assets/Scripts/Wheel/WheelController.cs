@@ -10,7 +10,6 @@ namespace Vertigo.Wheel
 {
     public class WheelController : MonoBehaviour
     {
-        [SerializeField] private RectTransform wheelContainer;
         [SerializeField] private Image baseImage;
         [SerializeField] private Image indicatorImage;
         [SerializeField] private List<SliceRef> sliceRefs;
@@ -42,7 +41,6 @@ namespace Vertigo.Wheel
             config = wheelConfig;
             spinning = false;
             DOTween.Kill(baseImage.rectTransform);
-            DOTween.Kill(wheelContainer);
             baseImage.sprite = config.baseSprite;
             indicatorImage.sprite = config.indicatorSprite;
 
@@ -62,10 +60,7 @@ namespace Vertigo.Wheel
             }
 
             if (!sameWheel)
-            {
-                wheelContainer.localRotation = Quaternion.identity;
                 baseImage.rectTransform.localRotation = Quaternion.identity;
-            }
         }
 
         private void Spin()
@@ -81,10 +76,6 @@ namespace Vertigo.Wheel
             var targetRotation = new Vector3(0, 0, totalAngle);
 
             baseImage.rectTransform
-                .DORotate(targetRotation, config.spinDuration, RotateMode.FastBeyond360)
-                .SetEase(Ease.OutQuart);
-
-            wheelContainer
                 .DORotate(targetRotation, config.spinDuration, RotateMode.FastBeyond360)
                 .SetEase(Ease.OutQuart)
                 .OnComplete(() =>

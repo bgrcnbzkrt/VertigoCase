@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
@@ -143,8 +142,7 @@ namespace Vertigo.UI
 
         private void RefreshGold(int gold)
         {
-            if (goldText != null)
-                goldText.text = gold.ToString();
+            goldText.text = gold.ToString();
         }
 
         private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
@@ -178,18 +176,17 @@ namespace Vertigo.UI
             if (rewardScrollRect != null)
                 ScrollToItem(targetSlot.transform as RectTransform);
 
-            var slot = targetSlot;
             var seq = DOTween.Sequence();
             seq.Append(flyingRewardIcon.DOScale(1.5f, 0.3f).SetEase(Ease.OutBack));
-            seq.Append(flyingRewardIcon.DOMove(slot.transform.position, 0.5f).SetEase(Ease.InBack));
+            seq.Append(flyingRewardIcon.DOMove(targetSlot.transform.position, 0.5f).SetEase(Ease.InBack));
             seq.Join(flyingRewardIcon.DOScale(0.3f, 0.5f));
             seq.OnComplete(() =>
             {
                 flyingRewardIcon.gameObject.SetActive(false);
                 if (isNew)
-                    slot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+                    targetSlot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
-                    slot.AddAmount(reward.Amount);
+                    targetSlot.AddAmount(reward.Amount);
             });
         }
 
