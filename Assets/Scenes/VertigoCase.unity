@@ -2938,7 +2938,7 @@ MonoBehaviour:
   - {fileID: 483185521}
   - {fileID: 537194586}
   zonePanel: {fileID: 2126330703}
-  spriteZoneNormal: {fileID: 21300000, guid: 6c3a6ca2d13beaf4f9be467d50cfc662, type: 3}
+  spriteZoneNormal: {fileID: 21300000, guid: 8feded449e0ac574e94d7c24092829e4, type: 3}
   spriteZoneSafe: {fileID: 21300000, guid: 6c3a6ca2d13beaf4f9be467d50cfc662, type: 3}
   spriteZoneSuper: {fileID: 21300000, guid: 91d5ce70eb954214baf38c46094b5a57, type: 3}
   zoneNormalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -3673,7 +3673,7 @@ GameObject:
   - component: {fileID: 829474609}
   - component: {fileID: 829474608}
   m_Layer: 5
-  m_Name: ui_current_zone_indicator_frame
+  m_Name: ui_image_current_zone_indicator_frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10502,7 +10502,7 @@ GameObject:
   - component: {fileID: 2126330704}
   - component: {fileID: 2126330703}
   m_Layer: 5
-  m_Name: ui_current_zone_indicator_background
+  m_Name: ui_image_current_zone_indicator_background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
