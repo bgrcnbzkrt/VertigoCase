@@ -100,9 +100,16 @@ namespace Vertigo.UI
                     continue;
                 }
 
-                var type = GameManager.Instance.GetZoneType(zone);
                 label.text = zone.ToString();
-                label.color = ZoneTextColor(type, zone < current);
+                if (i == center)
+                {
+                    label.color = Color.white;
+                }
+                else
+                {
+                    var type = GameManager.Instance.GetZoneType(zone);
+                    label.color = ZoneTextColor(type, zone < current);
+                }
             }
 
             var currentType = GameManager.Instance.GetZoneType(current);
