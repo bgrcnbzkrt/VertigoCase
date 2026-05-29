@@ -38,6 +38,7 @@ namespace Vertigo.Wheel
 
         public void Setup(WheelConfig wheelConfig, int zone)
         {
+            bool sameWheel = config == wheelConfig;
             config = wheelConfig;
             spinning = false;
             DOTween.Kill(baseImage.rectTransform);
@@ -60,8 +61,11 @@ namespace Vertigo.Wheel
                 sliceRefs[i].amountText.text = slice.isBomb ? "" : "x" + config.ScaleAmount(slice.amount, zone);
             }
 
-            wheelContainer.localRotation = Quaternion.identity;
-            baseImage.rectTransform.localRotation = Quaternion.identity;
+            if (!sameWheel)
+            {
+                wheelContainer.localRotation = Quaternion.identity;
+                baseImage.rectTransform.localRotation = Quaternion.identity;
+            }
         }
 
         private void Spin()

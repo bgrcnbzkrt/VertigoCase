@@ -18,14 +18,19 @@ namespace Vertigo.UI
 
         [Header("Zone")]
         [SerializeField] private TMP_Text zoneTitleText;
-        [SerializeField] private ZoneSlot[] zoneSlots;
+        [SerializeField] private TMP_Text[] zoneLabels;
+        [SerializeField] private Image zonePanel;
 
         [Header("Zone Sprites")]
         [SerializeField] private Sprite spriteZoneNormal;
         [SerializeField] private Sprite spriteZoneSafe;
         [SerializeField] private Sprite spriteZoneSuper;
-        [SerializeField] private Sprite spriteZonePassed;
-        [SerializeField] private Sprite spriteZoneCurrent;
+
+        [Header("Zone Text Colors")]
+        [SerializeField] private Color zoneNormalColor = Color.white;
+        [SerializeField] private Color zoneSafeColor = Color.green;
+        [SerializeField] private Color zoneSuperColor = Color.yellow;
+        [Range(0f, 1f)] [SerializeField] private float passedDim = 0.5f;
 
         [Header("Wheel")]
         [SerializeField] private WheelController wheelController;
@@ -38,13 +43,6 @@ namespace Vertigo.UI
         [SerializeField] private Transform rewardBarContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
         [SerializeField] private RectTransform flyingRewardIcon;
-
-        [Serializable]
-        public class ZoneSlot
-        {
-            public Image background;
-            public TMP_Text text;
-        }
 
         private void Start()
         {
@@ -89,48 +87,44 @@ namespace Vertigo.UI
 
         private void UpdateZoneIndicator(int current)
         {
-            int[] display = { current - 2, current - 1, current, current + 1, current + 2 };
+            int center = zoneLabels.Length / 2;
 
-            for (int i = 0; i < zoneSlots.Length && i < display.Length; i++)
+            for (int i = 0; i < zoneLabels.Length; i++)
             {
-                int zone = display[i];
-                var slot = zoneSlots[i];
+                int zone = current + (i - center);
+                var label = zoneLabels[i];
 
                 if (zone < 1)
                 {
-                    slot.background.gameObject.SetActive(true);
-                    slot.background.color = Color.clear;
-                    slot.text.text = "";
-                    slot.background.transform.localScale = Vector3.one;
+                    label.text = "";
                     continue;
                 }
 
-                slot.background.color = Color.white;
-                slot.background.gameObject.SetActive(true);
-                slot.text.text = zone.ToString();
-
-                if (zone < current)
-                {
-                    slot.background.sprite = spriteZonePassed;
-                    slot.background.transform.localScale = Vector3.one;
-                }
-                else if (zone == current)
-                {
-                    slot.background.sprite = spriteZoneCurrent;
-                    slot.background.transform.localScale = Vector3.one * 1.15f;
-                }
-                else
-                {
-                    var t = GameManager.Instance.GetZoneType(zone);
-                    slot.background.sprite = t switch
-                    {
-                        ZoneType.Super => spriteZoneSuper,
-                        ZoneType.Safe => spriteZoneSafe,
-                        _ => spriteZoneNormal
-                    };
-                    slot.background.transform.localScale = Vector3.one;
-                }
+                var type = GameManager.Instance.GetZoneType(zone);
+                label.text = zone.ToString();
+                label.color = ZoneTextColor(type, zone < current);
             }
+
+            var currentType = GameManager.Instance.GetZoneType(current);
+            zonePanel.sprite = currentType switch
+            {
+                ZoneType.Super => spriteZoneSuper,
+                ZoneType.Safe => spriteZoneSafe,
+                _ => spriteZoneNormal
+            };
+        }
+
+        private Color ZoneTextColor(ZoneType type, bool passed)
+        {
+            Color c = type switch
+            {
+                ZoneType.Super => zoneSuperColor,
+                ZoneType.Safe => zoneSafeColor,
+                _ => zoneNormalColor
+            };
+            if (passed)
+                c = new Color(c.r * passedDim, c.g * passedDim, c.b * passedDim, c.a);
+            return c;
         }
 
         private void RefreshButtons(GameState state)
