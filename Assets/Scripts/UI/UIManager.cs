@@ -67,11 +67,13 @@ namespace Vertigo.UI
 
         public virtual void Show()
         {
-            gameObject.SetActive(true);
-            canvasGroup.alpha = 0f;
-            canvasGroup.DOFade(1f, 0.25f).SetEase(Ease.OutQuad);
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+            if (gameObject.activeSelf && canvasGroup.alpha >= 1f) return;
+            gameObject.SetActive(true);
+            canvasGroup.DOKill();
+            canvasGroup.alpha = 0f;
+            canvasGroup.DOFade(1f, 0.25f).SetEase(Ease.OutQuad);
         }
 
         public virtual void Hide()
