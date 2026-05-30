@@ -94,6 +94,12 @@ namespace Vertigo.UI
             gameObject.SetActive(false);
         }
 
+        protected static void ClearChildren(Transform parent)
+        {
+            foreach (Transform child in parent)
+                Destroy(child.gameObject);
+        }
+
         protected virtual void OnValidate()
         {
             if (canvasGroup == null)

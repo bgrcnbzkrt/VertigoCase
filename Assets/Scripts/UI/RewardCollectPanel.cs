@@ -7,8 +7,8 @@ namespace Vertigo.UI
     public class RewardCollectPanel : PanelBase
     {
         [SerializeField] private Button buttonCollect;
-        [SerializeField] private Transform rewardGrid;
-        [SerializeField] private RewardSlotUI slotPrefab;
+        [SerializeField] private Transform slotContainer;
+        [SerializeField] private RewardSlotUI rewardSlotPrefab;
 
         private void Start()
         {
@@ -17,12 +17,11 @@ namespace Vertigo.UI
 
         public override void Show()
         {
-            foreach (Transform child in rewardGrid)
-                Destroy(child.gameObject);
+            ClearChildren(slotContainer);
 
             foreach (var r in GameManager.Instance.Rewards)
             {
-                var slot = Instantiate(slotPrefab, rewardGrid);
+                var slot = Instantiate(rewardSlotPrefab, slotContainer);
                 slot.Setup(r);
             }
 

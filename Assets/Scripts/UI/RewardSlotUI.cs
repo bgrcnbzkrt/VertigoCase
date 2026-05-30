@@ -11,12 +11,12 @@ namespace Vertigo.UI
         [SerializeField] private Image icon;
         [SerializeField] private TMP_Text amountText;
 
-        public RewardItemData RewardData { get; private set; }
+        public RewardItemData Reward { get; private set; }
         private int totalAmount;
 
         public void Setup(CollectedReward reward)
         {
-            RewardData = reward.Reward;
+            Reward = reward.Reward;
             totalAmount = reward.Amount;
             icon.sprite = reward.Reward.icon;
             icon.preserveAspect = true;
@@ -32,8 +32,8 @@ namespace Vertigo.UI
 
         private void OnValidate()
         {
-            if (icon == null) icon = GetComponentInChildren<Image>();
-            if (amountText == null) amountText = GetComponentInChildren<TMP_Text>();
+            if (icon == null) icon = GetComponentInChildren<Image>(true);
+            if (amountText == null) amountText = GetComponentInChildren<TMP_Text>(true);
         }
     }
 }

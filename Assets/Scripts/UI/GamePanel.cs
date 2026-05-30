@@ -40,10 +40,14 @@ namespace Vertigo.UI
 
         [Header("Reward Bar")]
         [SerializeField] private ScrollRect rewardScrollRect;
-        [SerializeField] private Transform rewardBarContainer;
+        [SerializeField] private Transform slotContainer;
         [SerializeField] private RewardSlotUI rewardSlotPrefab;
         [SerializeField] private RectTransform flyingRewardIcon;
         [SerializeField] private GameObject flyingRewardGlow;
+
+        private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
+        private Image flyingRewardImage;
+        private CanvasGroup flyingRewardGlowGroup;
 
         private void Start()
         {
@@ -157,15 +161,13 @@ namespace Vertigo.UI
             moneyText.text = money.ToString();
         }
 
-        private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
-        private Image flyingRewardImage;
-
         private void Awake()
         {
             flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
             flyingRewardImage.preserveAspect = true;
             flyingRewardIcon.gameObject.SetActive(false);
-            flyingRewardGlow.SetActive(false);
+            flyingRewardGlowGroup = flyingRewardGlow.GetComponent<CanvasGroup>();
+            flyingRewardGlowGroup.alpha = 0f;
         }
 
         private void AddRewardSlot(CollectedReward reward)
@@ -174,13 +176,20 @@ namespace Vertigo.UI
             flyingRewardIcon.position = wheelController.transform.position;
             flyingRewardIcon.localScale = Vector3.zero;
             flyingRewardIcon.gameObject.SetActive(true);
-            flyingRewardGlow.SetActive(true);
+
+            flyingRewardGlowGroup.DOKill();
+            flyingRewardGlowGroup.alpha = 0f;
+            flyingRewardGlowGroup.DOFade(1f, 0.2f);
+            flyingRewardGlow.transform.DOKill();
+            flyingRewardGlow.transform.DOLocalRotate(new Vector3(0f, 0f, -360f), 4f, RotateMode.FastBeyond360)
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Restart);
 
             bool isNew = !rewardSlotMap.TryGetValue(reward.Reward, out var targetSlot);
 
             if (isNew)
             {
-                targetSlot = Instantiate(rewardSlotPrefab, rewardBarContainer);
+                targetSlot = Instantiate(rewardSlotPrefab, slotContainer);
                 targetSlot.Setup(reward);
                 targetSlot.transform.localScale = Vector3.zero;
                 rewardSlotMap[reward.Reward] = targetSlot;
@@ -197,7 +206,8 @@ namespace Vertigo.UI
             seq.OnComplete(() =>
             {
                 flyingRewardIcon.gameObject.SetActive(false);
-                flyingRewardGlow.SetActive(false);
+                flyingRewardGlow.transform.DOKill();
+                flyingRewardGlowGroup.DOFade(0f, 0.25f);
                 if (isNew)
                     targetSlot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
@@ -210,7 +220,7 @@ namespace Vertigo.UI
             if (rewardScrollRect == null || item == null) return;
             Canvas.ForceUpdateCanvases();
 
-            var content = rewardBarContainer as RectTransform;
+            var content = slotContainer as RectTransform;
             var viewport = rewardScrollRect.viewport != null
                 ? rewardScrollRect.viewport
                 : rewardScrollRect.GetComponent<RectTransform>();
@@ -240,8 +250,7 @@ namespace Vertigo.UI
 
         private void ClearRewardBar()
         {
-            foreach (Transform child in rewardBarContainer)
-                Destroy(child.gameObject);
+            ClearChildren(slotContainer);
             rewardSlotMap.Clear();
         }
 
