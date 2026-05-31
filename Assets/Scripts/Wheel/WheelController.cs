@@ -56,7 +56,10 @@ namespace Vertigo.Wheel
                 var slice = config.slices[i];
                 sliceRefs[i].icon.sprite = slice.reward.icon;
                 sliceRefs[i].icon.preserveAspect = true;
-                sliceRefs[i].amountText.text = slice.reward.type == RewardType.Bomb ? "" : "x" + config.ScaleAmount(slice.amount, zone);
+                if (slice.reward.type == RewardType.Bomb)
+                    sliceRefs[i].amountText.SetText("");
+                else
+                    sliceRefs[i].amountText.SetText("x{0}", config.ScaleAmount(slice.amount, zone));
             }
 
             // only reset rotation when switching wheels, otherwise it jumps mid-game
@@ -64,12 +67,12 @@ namespace Vertigo.Wheel
                 baseImage.rectTransform.localRotation = Quaternion.identity;
         }
 
-        private void Spin()
+        // target slice is decided by GameManager; the wheel only plays the animation
+        private void Spin(int target)
         {
             if (spinning || config == null) return;
             spinning = true;
 
-            int target = Random.Range(0, config.slices.Count);
             float sliceAngle = 360f / config.slices.Count;
             int rotations = Random.Range(config.minRotations, config.maxRotations + 1);
             float totalAngle = 360f * rotations + (target * sliceAngle);
@@ -83,7 +86,7 @@ namespace Vertigo.Wheel
                 .OnComplete(() =>
                 {
                     spinning = false;
-                    GameManager.Instance.ReportSpinResult(config.slices[target]);
+                    GameManager.Instance.OnSpinComplete();
                 });
         }
     }

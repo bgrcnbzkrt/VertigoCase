@@ -10,7 +10,6 @@ namespace Vertigo.Data
         public string rewardName;
         public Sprite icon;
         public RewardType type;
-        public int baseAmount = 1;
     }
 
     public struct CollectedReward

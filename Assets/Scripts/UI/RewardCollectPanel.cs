@@ -31,8 +31,7 @@ namespace Vertigo.UI
         protected override void OnValidate()
         {
             base.OnValidate();
-            foreach (var btn in GetComponentsInChildren<Button>(true))
-                if (btn.name == "ui_button_collect") buttonCollect = btn;
+            buttonCollect = FindButton("ui_button_collect");
         }
     }
 }

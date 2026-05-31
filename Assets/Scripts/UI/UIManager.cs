@@ -11,16 +11,19 @@ namespace Vertigo.UI
         [SerializeField] private BombPanel bomb;
         [SerializeField] private RewardCollectPanel rewardCollect;
 
+        private PanelBase[] allPanels;
+
         private void Awake()
         {
-            DOTween.Init();
+            // recycle tweens so the spin/reward animations don't keep allocating
+            DOTween.Init(recycleAllByDefault: true);
+            allPanels = new PanelBase[] { mainMenu, game, bomb, rewardCollect };
         }
 
         private void Start()
         {
-            game.HideImmediate();
-            bomb.HideImmediate();
-            rewardCollect.HideImmediate();
+            foreach (var panel in allPanels)
+                if (panel != mainMenu) panel.HideImmediate();
             mainMenu.Show();
         }
 
@@ -39,17 +42,12 @@ namespace Vertigo.UI
             switch (state)
             {
                 case GameState.MainMenu:
-                    game.Hide();
-                    bomb.Hide();
-                    rewardCollect.Hide();
-                    mainMenu.Show();
+                    ShowOnly(mainMenu);
                     break;
                 case GameState.Playing:
-                    mainMenu.Hide();
-                    bomb.Hide();
-                    rewardCollect.Hide();
-                    game.Show();
+                    ShowOnly(game);
                     break;
+                // bomb/collect sit on top of the game panel, leave the rest as is
                 case GameState.BombHit:
                     bomb.Show();
                     break;
@@ -58,52 +56,14 @@ namespace Vertigo.UI
                     break;
             }
         }
-    }
 
-    [RequireComponent(typeof(CanvasGroup))]
-    public abstract class PanelBase : MonoBehaviour
-    {
-        [SerializeField] private CanvasGroup canvasGroup;
-
-        public virtual void Show()
+        private void ShowOnly(PanelBase target)
         {
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-            if (gameObject.activeSelf && canvasGroup.alpha >= 1f) return;
-            gameObject.SetActive(true);
-            canvasGroup.DOKill();
-            canvasGroup.alpha = 0f;
-            canvasGroup.DOFade(1f, 0.25f).SetEase(Ease.OutQuad);
-        }
-
-        public virtual void Hide()
-        {
-            if (!gameObject.activeSelf) return;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.DOFade(0f, 0.2f)
-                .SetEase(Ease.InQuad)
-                .OnComplete(() => gameObject.SetActive(false));
-        }
-
-        public void HideImmediate()
-        {
-            canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            gameObject.SetActive(false);
-        }
-
-        protected static void ClearChildren(Transform parent)
-        {
-            foreach (Transform child in parent)
-                Destroy(child.gameObject);
-        }
-
-        protected virtual void OnValidate()
-        {
-            if (canvasGroup == null)
-                canvasGroup = GetComponent<CanvasGroup>();
+            foreach (var panel in allPanels)
+            {
+                if (panel == target) panel.Show();
+                else panel.Hide();
+            }
         }
     }
 }

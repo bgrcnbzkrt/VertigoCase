@@ -20,14 +20,20 @@ namespace Vertigo.UI
             totalAmount = reward.Amount;
             icon.sprite = reward.Reward.icon;
             icon.preserveAspect = true;
-            amountText.text = "x" + totalAmount;
+            amountText.SetText("x{0}", totalAmount);
         }
 
         public void AddAmount(int amount)
         {
             totalAmount += amount;
-            amountText.text = "x" + totalAmount;
+            amountText.SetText("x{0}", totalAmount);
             transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 8, 0.5f);
+        }
+
+        private void OnDestroy()
+        {
+            // slots get destroyed when the bar clears; kill any running punch tween first
+            transform.DOKill();
         }
 
         private void OnValidate()

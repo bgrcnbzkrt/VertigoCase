@@ -17,14 +17,19 @@ namespace Vertigo.Core
         [SerializeField] private WheelConfig silverWheel;
         [SerializeField] private WheelConfig goldenWheel;
 
+        [Header("Zone Rules")]
+        [SerializeField] private int safeZoneInterval = 5;
+        [SerializeField] private int superZoneInterval = 30;
+
         public GameState State { get; private set; }
         public int CurrentZone { get; private set; }
-        public IReadOnlyList<CollectedReward> Rewards => collected;
+        public IReadOnlyList<CollectedReward> Rewards => rewards.Items;
 
-        private readonly List<CollectedReward> collected = new();
+        private readonly RewardCollection rewards = new();
+        private int pendingSpinTarget;
 
         public static event Action<GameState> OnStateChanged;
-        public static event Action OnSpinRequested;
+        public static event Action<int> OnSpinRequested;
         public static event Action<int, ZoneType> OnZoneChanged;
         public static event Action<CollectedReward> OnRewardCollected;
         public static event Action OnRewardsCleared;
@@ -37,7 +42,7 @@ namespace Vertigo.Core
 
         public void StartGame()
         {
-            collected.Clear();
+            rewards.Clear();
             CurrentZone = 0;
             SetState(GameState.Playing);
             AdvanceZone();
@@ -46,11 +51,20 @@ namespace Vertigo.Core
         public void RequestSpin()
         {
             if (State != GameState.Playing) return;
+            // the model rolls the result here; the wheel only animates to this slice
+            pendingSpinTarget = UnityEngine.Random.Range(0, GetCurrentWheel().slices.Count);
             SetState(GameState.Spinning);
-            OnSpinRequested?.Invoke();
+            OnSpinRequested?.Invoke(pendingSpinTarget);
         }
 
-        public void ReportSpinResult(SliceData result)
+        // the wheel view calls this once its landing animation finishes
+        public void OnSpinComplete()
+        {
+            if (State != GameState.Spinning) return;
+            ReportSpinResult(GetCurrentWheel().slices[pendingSpinTarget]);
+        }
+
+        private void ReportSpinResult(SliceData result)
         {
             if (result.reward.type == RewardType.Bomb)
             {
@@ -59,22 +73,10 @@ namespace Vertigo.Core
             }
 
             int amount = GetCurrentWheel().ScaleAmount(result.amount, CurrentZone);
-            var reward = new CollectedReward(result.reward, amount);
+            rewards.Add(result.reward, amount);
 
-            // stack onto existing row if we already won this one
-            int idx = collected.FindIndex(r => r.Reward == result.reward);
-            if (idx >= 0)
-            {
-                var existing = collected[idx];
-                existing.Amount += amount;
-                collected[idx] = existing;
-            }
-            else
-            {
-                collected.Add(reward);
-            }
-
-            OnRewardCollected?.Invoke(reward);
+            // event carries this spin's amount so the UI can animate the increment
+            OnRewardCollected?.Invoke(new CollectedReward(result.reward, amount));
             AdvanceZone();
             SetState(GameState.Playing);
         }
@@ -96,33 +98,28 @@ namespace Vertigo.Core
 
         public void GiveUp()
         {
-            collected.Clear();
+            rewards.Clear();
             OnRewardsCleared?.Invoke();
             SetState(GameState.MainMenu);
         }
 
         public void BackToMenu()
         {
-            if (State == GameState.Collecting)
+            if (State == GameState.Collecting && CurrencyManager.Instance != null)
             {
-                foreach (var r in collected)
-                {
-                    if (r.Reward.type == RewardType.Gold)
-                        CurrencyManager.Instance.AddGold(r.Amount);
-                    else if (r.Reward.type == RewardType.Money)
-                        CurrencyManager.Instance.AddMoney(r.Amount);
-                }
+                foreach (var r in rewards.Items)
+                    CurrencyManager.Instance.Deposit(r.Reward.type, r.Amount);
             }
-            collected.Clear();
+            rewards.Clear();
             OnRewardsCleared?.Invoke();
             SetState(GameState.MainMenu);
         }
 
         public ZoneType GetZoneType(int zone)
         {
-            // safe zone every 5, super every 30
-            if (zone > 0 && zone % 30 == 0) return ZoneType.Super;
-            if (zone > 0 && zone % 5 == 0) return ZoneType.Safe;
+            // intervals are designer-tunable from the inspector (default 5 / 30)
+            if (zone > 0 && zone % superZoneInterval == 0) return ZoneType.Super;
+            if (zone > 0 && zone % safeZoneInterval == 0) return ZoneType.Safe;
             return ZoneType.Normal;
         }
 

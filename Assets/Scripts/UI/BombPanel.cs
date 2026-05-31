@@ -25,20 +25,16 @@ namespace Vertigo.UI
             int cost = CurrencyManager.Instance.ReviveCost;
             bool canAfford = CurrencyManager.Instance.CanAfford(cost);
             buttonRevive.interactable = canAfford;
-            reviveCostText.text = cost.ToString();
-            goldText.text = CurrencyManager.Instance.Gold.ToString();
-            moneyText.text = CurrencyManager.Instance.Money.ToString();
+            reviveCostText.SetText("{0}", cost);
+            goldText.SetText("{0}", CurrencyManager.Instance.Gold);
+            moneyText.SetText("{0}", CurrencyManager.Instance.Money);
         }
 
         protected override void OnValidate()
         {
             base.OnValidate();
-            // grab buttons by name so don't have to re-drag refs every prefab change
-            foreach (var btn in GetComponentsInChildren<Button>(true))
-            {
-                if (btn.name == "ui_button_give_up") buttonGiveUp = btn;
-                if (btn.name == "ui_button_revive") buttonRevive = btn;
-            }
+            buttonGiveUp = FindButton("ui_button_give_up");
+            buttonRevive = FindButton("ui_button_revive");
         }
     }
 }

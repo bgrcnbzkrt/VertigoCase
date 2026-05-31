@@ -46,8 +46,7 @@ namespace Vertigo.UI
         [SerializeField] private GameObject flyingRewardGlow;
 
         private readonly Dictionary<RewardItemData, RewardSlotUI> rewardSlotMap = new();
-        private Image flyingRewardImage;
-        private CanvasGroup flyingRewardGlowGroup;
+        private RewardFlyAnimator flyAnimator;
 
         private void Start()
         {
@@ -81,12 +80,12 @@ namespace Vertigo.UI
         {
             wheelController.Setup(GameManager.Instance.GetCurrentWheel(), zone);
 
-            zoneTitleText.text = type switch
-            {
-                ZoneType.Super => "SUPER ZONE",
-                ZoneType.Safe => "SAFE ZONE",
-                _ => "ZONE " + zone
-            };
+            if (type == ZoneType.Super)
+                zoneTitleText.SetText("SUPER ZONE");
+            else if (type == ZoneType.Safe)
+                zoneTitleText.SetText("SAFE ZONE");
+            else
+                zoneTitleText.SetText("ZONE {0}", zone);
 
             buttonLeave.interactable = GameManager.Instance.CanLeave();
             UpdateZoneIndicator(zone);
@@ -107,7 +106,7 @@ namespace Vertigo.UI
                     continue;
                 }
 
-                label.text = zone.ToString();
+                label.SetText("{0}", zone);
                 if (i == center)
                 {
                     label.color = Color.white;
@@ -153,38 +152,21 @@ namespace Vertigo.UI
 
         private void RefreshGold(int gold)
         {
-            goldText.text = gold.ToString();
+            goldText.SetText("{0}", gold);
         }
 
         private void RefreshMoney(int money)
         {
-            moneyText.text = money.ToString();
+            moneyText.SetText("{0}", money);
         }
 
         private void Awake()
         {
-            flyingRewardImage = flyingRewardIcon.GetComponent<Image>();
-            flyingRewardImage.preserveAspect = true;
-            flyingRewardIcon.gameObject.SetActive(false);
-            flyingRewardGlowGroup = flyingRewardGlow.GetComponent<CanvasGroup>();
-            flyingRewardGlowGroup.alpha = 0f;
+            flyAnimator = new RewardFlyAnimator(flyingRewardIcon, flyingRewardGlow);
         }
 
         private void AddRewardSlot(CollectedReward reward)
         {
-            flyingRewardImage.sprite = reward.Reward.icon;
-            flyingRewardIcon.position = wheelController.transform.position;
-            flyingRewardIcon.localScale = Vector3.zero;
-            flyingRewardIcon.gameObject.SetActive(true);
-
-            flyingRewardGlowGroup.DOKill();
-            flyingRewardGlowGroup.alpha = 0f;
-            flyingRewardGlowGroup.DOFade(1f, 0.2f);
-            flyingRewardGlow.transform.DOKill();
-            flyingRewardGlow.transform.DOLocalRotate(new Vector3(0f, 0f, -360f), 4f, RotateMode.FastBeyond360)
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Restart);
-
             bool isNew = !rewardSlotMap.TryGetValue(reward.Reward, out var targetSlot);
 
             if (isNew)
@@ -193,21 +175,15 @@ namespace Vertigo.UI
                 targetSlot.Setup(reward);
                 targetSlot.transform.localScale = Vector3.zero;
                 rewardSlotMap[reward.Reward] = targetSlot;
-                Canvas.ForceUpdateCanvases();
+                // rebuild just this container's layout (not every canvas)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(slotContainer as RectTransform);
             }
 
             if (rewardScrollRect != null)
                 ScrollToItem(targetSlot.transform as RectTransform);
 
-            var seq = DOTween.Sequence();
-            seq.Append(flyingRewardIcon.DOScale(1.5f, 0.3f).SetEase(Ease.OutBack));
-            seq.Append(flyingRewardIcon.DOMove(targetSlot.transform.position, 0.5f).SetEase(Ease.InBack));
-            seq.Join(flyingRewardIcon.DOScale(0.3f, 0.5f));
-            seq.OnComplete(() =>
+            flyAnimator.Play(reward.Reward.icon, wheelController.transform.position, targetSlot.transform.position, () =>
             {
-                flyingRewardIcon.gameObject.SetActive(false);
-                flyingRewardGlow.transform.DOKill();
-                flyingRewardGlowGroup.DOFade(0f, 0.25f);
                 if (isNew)
                     targetSlot.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
                 else
@@ -218,7 +194,6 @@ namespace Vertigo.UI
         private void ScrollToItem(RectTransform item)
         {
             if (rewardScrollRect == null || item == null) return;
-            Canvas.ForceUpdateCanvases();
 
             var content = slotContainer as RectTransform;
             var viewport = rewardScrollRect.viewport != null
@@ -257,11 +232,8 @@ namespace Vertigo.UI
         protected override void OnValidate()
         {
             base.OnValidate();
-            foreach (var btn in GetComponentsInChildren<Button>(true))
-            {
-                if (btn.name == "ui_button_spin") buttonSpin = btn;
-                if (btn.name == "ui_button_leave") buttonLeave = btn;
-            }
+            buttonSpin = FindButton("ui_button_spin");
+            buttonLeave = FindButton("ui_button_leave");
             if (wheelController == null)
                 wheelController = GetComponentInChildren<WheelController>(true);
         }
